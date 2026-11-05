@@ -127,9 +127,9 @@ export function renderDashboard(container, summary, { onAddFill }) {
         summary.totalDistanceKm === null ? null : 'depuis le premier plein',
       ),
       stat(
-        'Rendement moyen',
-        formatKmPerL(summary.overallKmPerL),
-        hasEfficiency ? formatLPer100Km(summary.overallLPer100Km) : null,
+        'Consommation moyenne',
+        formatLPer100Km(summary.overallLPer100Km),
+        hasEfficiency ? formatKmPerL(summary.overallKmPerL) : null,
       ),
     ),
     hint && el('p', { className: 'hint' }, hint),
