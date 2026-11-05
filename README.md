@@ -31,4 +31,10 @@ js/
 
 ## Tests
 
-Coming in #5.
+Tests use Node's built-in runner and assertions (Node 18+, no npm install). From the project root:
+
+```sh
+node --test
+```
+
+Node finds `tests/*.test.js` automatically. More test coverage and a browser test page come in #5.
