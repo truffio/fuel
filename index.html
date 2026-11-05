@@ -23,7 +23,13 @@
 
     <section id="chart-section" class="panel" aria-labelledby="chart-title">
       <h2 id="chart-title">Graphique</h2>
-      <div id="chart-content"></div>
+      <fieldset class="metric-picker">
+        <legend>Métrique affichée</legend>
+        <label><input type="radio" name="chart-metric" value="pricePerLiter"> Prix du litre</label>
+        <label><input type="radio" name="chart-metric" value="kmPerL"> Rendement</label>
+        <label><input type="radio" name="chart-metric" value="cumulativeCost"> Dépenses cumulées</label>
+      </fieldset>
+      <div id="chart-content" class="chart"></div>
     </section>
 
     <section id="history" class="panel" aria-labelledby="history-title">
