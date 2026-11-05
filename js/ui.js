@@ -1,12 +1,17 @@
 // DOM rendering and user interactions: dashboard, form, history (spec §6).
 // Content is built with DOM APIs (textContent), never innerHTML, so stored text is never interpreted as markup.
 
+import { INTERVAL_STATUS } from './calculations.js';
 import {
+  MISSING,
   formatCount,
   formatCurrency,
+  formatDate,
   formatKm,
   formatKmPerL,
   formatLPer100Km,
+  formatLiters,
+  formatPricePerLiter,
 } from './format.js';
 
 /**
@@ -253,5 +258,163 @@ export function createFillForm({ dialog, onSubmit, onPreview, today }) {
     openAdd: () => open({ mode: 'add', values: { fullTank: false } }),
     openEdit: (fill) => open({ mode: 'edit', values: fill }),
     close,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// History (spec §6.4)
+
+/** Why the efficiency of an interval is not shown, as text (never colour only). */
+const INTERVAL_REASON = {
+  [INTERVAL_STATUS.reference]: 'Premier plein : point de référence',
+  [INTERVAL_STATUS.notFull]: 'Non calculable : plein partiel',
+  [INTERVAL_STATUS.broken]: 'Non calculable : un plein intermédiaire a été supprimé',
+  [INTERVAL_STATUS.invalidDistance]: 'Non calculable : distance nulle',
+};
+
+const HISTORY_COLUMNS = [
+  { key: 'date', label: 'Date' },
+  { key: 'odometer', label: 'Odomètre', numeric: true },
+  { key: 'liters', label: 'Litres', numeric: true },
+  { key: 'price', label: 'Prix/L', numeric: true },
+  { key: 'cost', label: 'Coût', numeric: true },
+  { key: 'distance', label: 'Distance', numeric: true },
+  { key: 'efficiency', label: 'Rendement', numeric: true },
+  { key: 'cumulative', label: 'Cumul', numeric: true },
+  { key: 'actions', label: 'Actions' },
+];
+
+function efficiencyCell(record) {
+  if (record.kmPerL !== null) {
+    return [
+      el('span', {}, formatKmPerL(record.kmPerL)),
+      el('span', { className: 'cell-detail' }, formatLPer100Km(record.lPer100Km)),
+    ];
+  }
+  const reason = INTERVAL_REASON[record.intervalStatus] ?? 'Non calculable';
+  return [
+    el('span', { attrs: { 'aria-hidden': 'true' } }, MISSING),
+    el('span', { className: `cell-detail reason reason-${record.intervalStatus}` }, reason.replace(' : ', ' : ')),
+  ];
+}
+
+/**
+ * History table, most recent first (spec §6.4). On narrow screens CSS turns each row
+ * into a card, using each cell's data-label as its caption.
+ */
+export function renderHistory(container, enriched, { onEdit, onDelete }) {
+  const rows = [...enriched].reverse().map((record) => {
+    const date = formatDate(record.date);
+    const cells = {
+      date: el('time', { dateTime: record.date }, date),
+      odometer: formatKm(record.odometerKm),
+      liters: formatLiters(record.liters),
+      price: formatPricePerLiter(record.pricePerLiterCad),
+      cost: formatCurrency(record.cost),
+      distance: formatKm(record.distanceKm),
+      efficiency: efficiencyCell(record),
+      cumulative: formatCurrency(record.cumulativeCost),
+      actions: el(
+        'div',
+        { className: 'row-actions' },
+        el(
+          'button',
+          {
+            type: 'button',
+            className: 'button button-small',
+            attrs: { 'aria-label': `Modifier le plein du ${date}` },
+            on: { click: () => onEdit(record.id) },
+          },
+          'Modifier',
+        ),
+        el(
+          'button',
+          {
+            type: 'button',
+            className: 'button button-small button-danger-outline',
+            attrs: { 'aria-label': `Supprimer le plein du ${date}` },
+            on: { click: () => onDelete(record.id) },
+          },
+          'Supprimer',
+        ),
+      ),
+    };
+
+    return el(
+      'tr',
+      { dataset: { id: record.id, status: record.intervalStatus } },
+      HISTORY_COLUMNS.map(({ key, label, numeric }) =>
+        el(
+          key === 'date' ? 'th' : 'td',
+          {
+            className: `col-${key}${numeric ? ' numeric' : ''}`,
+            dataset: { label },
+            attrs: key === 'date' ? { scope: 'row' } : {},
+          },
+          cells[key],
+        ),
+      ),
+    );
+  });
+
+  container.replaceChildren(
+    el(
+      'div',
+      { className: 'table-wrap' },
+      el(
+        'table',
+        { className: 'history-table' },
+        el('caption', {}, `${formatCount(enriched.length)} plein(s), du plus récent au plus ancien`),
+        el(
+          'thead',
+          {},
+          el(
+            'tr',
+            {},
+            HISTORY_COLUMNS.map(({ key, label, numeric }) =>
+              el('th', { scope: 'col', className: `col-${key}${numeric ? ' numeric' : ''}` }, label),
+            ),
+          ),
+        ),
+        el('tbody', {}, rows),
+      ),
+    ),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Confirmation dialog (deletion)
+
+/**
+ * Wraps the #confirm-dialog element.
+ * confirm({ text, warning }) resolves to true when the user confirms.
+ */
+export function createConfirmDialog(dialog) {
+  const form = dialog.querySelector('form');
+  const text = dialog.querySelector('#confirm-text');
+  const warning = dialog.querySelector('#confirm-warning');
+  let settle = null;
+
+  // The button choice is read from the synchronous submit event; `close` (also fired by Esc)
+  // only settles a pending choice as “cancel”.
+  form.addEventListener('submit', (event) => {
+    settle?.(event.submitter?.value === 'confirm');
+  });
+  dialog.addEventListener('close', () => settle?.(false));
+
+  return {
+    confirm({ text: message, warning: warningText = null }) {
+      settle?.(false);
+      text.textContent = message;
+      warning.textContent = warningText ?? '';
+      warning.hidden = !warningText;
+      dialog.showModal();
+      return new Promise((resolve) => {
+        settle = (confirmed) => {
+          settle = null;
+          resolve(confirmed);
+        };
+      });
+    },
   };
 }

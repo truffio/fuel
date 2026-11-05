@@ -17,7 +17,7 @@
   --space-3: 1rem;
   --space-4: 1.5rem;
   --tap-size: 44px;
-  --max-width: 960px;
+  --max-width: 1080px;
 
   --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
@@ -333,4 +333,171 @@ dialog {
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: var(--space-2);
+}
+
+/* Buttons: variants */
+.button-small {
+  min-height: var(--tap-size);
+  padding: 0 var(--space-2);
+  font-size: 0.875rem;
+}
+
+.button-danger {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: var(--color-surface);
+  font-weight: 600;
+}
+
+.button-danger-outline {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+/* History: table on wide screens, cards on narrow ones */
+.table-wrap {
+  min-width: 0;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.history-table caption {
+  text-align: left;
+  color: var(--color-muted);
+  font-size: 0.875rem;
+  padding-bottom: var(--space-2);
+}
+
+.history-table th,
+.history-table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.history-table thead th {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.history-table .numeric {
+  text-align: right;
+}
+
+.history-table tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cell-detail {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+}
+
+.reason {
+  font-style: italic;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+
+.history-table td.col-efficiency .reason {
+  max-width: 12rem;
+  margin-left: auto;
+}
+
+@media (max-width: 999px) {
+  .history-table caption {
+    display: block;
+  }
+
+  .history-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .history-table,
+  .history-table tbody,
+  .history-table tr,
+  .history-table th,
+  .history-table td {
+    display: block;
+  }
+
+  .history-table tbody tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-1) var(--space-3);
+    padding: var(--space-3);
+    margin-bottom: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .history-table tbody th,
+  .history-table tbody td {
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  .history-table tbody th {
+    grid-column: 1 / -1;
+    font-size: 1.0625rem;
+  }
+
+  .history-table .numeric {
+    text-align: left;
+  }
+
+  .history-table tbody td::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--color-muted);
+  }
+
+  .history-table td.col-efficiency,
+  .history-table td.col-actions {
+    grid-column: 1 / -1;
+  }
+
+  .history-table td.col-actions::before {
+    content: none;
+  }
+
+  .history-table td.col-efficiency .reason {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .row-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding-top: var(--space-1);
+  }
+}
+
+/* Confirmation dialog */
+.confirm-form {
+  display: grid;
+  gap: var(--space-3);
+}
+
+#history-title:focus {
+  outline: none;
 }

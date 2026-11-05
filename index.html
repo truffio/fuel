@@ -27,7 +27,7 @@
     </section>
 
     <section id="history" class="panel" aria-labelledby="history-title">
-      <h2 id="history-title">Historique des pleins</h2>
+      <h2 id="history-title" tabindex="-1">Historique des pleins</h2>
       <div id="history-content"></div>
     </section>
   </main>
@@ -79,6 +79,18 @@
       <div class="form-actions">
         <button type="button" id="fill-cancel" class="button">Annuler</button>
         <button type="submit" id="fill-submit" class="button button-primary">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-text confirm-warning">
+    <form method="dialog" class="confirm-form">
+      <h2 id="confirm-title">Supprimer ce plein&#8239;?</h2>
+      <p id="confirm-text"></p>
+      <p id="confirm-warning" class="message message-warning" hidden></p>
+      <div class="form-actions">
+        <button type="submit" value="cancel" class="button" autofocus>Annuler</button>
+        <button type="submit" value="confirm" id="confirm-accept" class="button button-danger">Supprimer</button>
       </div>
     </form>
   </dialog>
