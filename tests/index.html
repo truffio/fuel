@@ -1,0 +1,107 @@
+﻿<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tests — Suivi d’essence</title>
+  <!-- Map the Node built-ins used by the test files to small browser shims. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "node:test": "./browser/nodeTestShim.js",
+        "node:assert/strict": "./browser/nodeAssertShim.js"
+      }
+    }
+  </script>
+  <style>
+    :root { color-scheme: light dark; --pass: #1a7f37; --fail: #cf222e; }
+    @media (prefers-color-scheme: dark) { :root { --pass: #4ac26b; --fail: #ff8182; } }
+    body { margin: 0 auto; max-width: 960px; padding: 1rem; font: 1rem/1.5 system-ui, sans-serif; }
+    h1 { font-size: 1.375rem; margin: 0 0 0.5rem; }
+    #summary { font-weight: 600; margin: 0 0 1rem; }
+    #summary.pass { color: var(--pass); }
+    #summary.fail { color: var(--fail); }
+    h2 { font-size: 1rem; margin: 1.25rem 0 0.25rem; }
+    ul { list-style: none; margin: 0; padding: 0; }
+    li { padding: 0.25rem 0; border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent); }
+    .status { display: inline-block; min-width: 4.5rem; font-weight: 600; }
+    .pass .status { color: var(--pass); }
+    .fail .status { color: var(--fail); }
+    pre { margin: 0.25rem 0 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <h1>Tests automatisés</h1>
+  <p id="summary" role="status">Exécution en cours…</p>
+  <div id="results"></div>
+
+  <script type="module">
+    import { registeredTests, setCurrentFile } from './browser/nodeTestShim.js';
+
+    // Keep in sync with tests/*.test.js.
+    const files = ['calculations.test.js', 'validation.test.js', 'storage.test.js'];
+
+    const summary = document.getElementById('summary');
+    const results = document.getElementById('results');
+
+    function finish(text, passed) {
+      summary.textContent = text;
+      summary.className = passed ? 'pass' : 'fail';
+      document.title = `${passed ? '✔' : '✖'} ${text} — Tests`;
+      document.body.dataset.result = passed ? 'pass' : 'fail';
+    }
+
+    try {
+      for (const file of files) {
+        setCurrentFile(file);
+        await import(`./${file}`);
+      }
+
+      let passed = 0;
+      let failed = 0;
+      let list = null;
+      let lastFile = null;
+
+      for (const { file, name, fn } of registeredTests) {
+        if (file !== lastFile) {
+          const heading = document.createElement('h2');
+          heading.textContent = file;
+          list = document.createElement('ul');
+          results.append(heading, list);
+          lastFile = file;
+        }
+
+        const item = document.createElement('li');
+        const status = document.createElement('span');
+        status.className = 'status';
+        item.append(status, name);
+
+        try {
+          await fn();
+          passed += 1;
+          item.className = 'pass';
+          status.textContent = 'Réussi';
+        } catch (error) {
+          failed += 1;
+          item.className = 'fail';
+          status.textContent = 'Échec';
+          const details = document.createElement('pre');
+          details.textContent = error?.message ?? String(error);
+          item.append(details);
+          console.error(`[${file}] ${name}`, error);
+        }
+        list.append(item);
+      }
+
+      const total = passed + failed;
+      finish(
+        failed === 0 ? `${total} tests réussis` : `${failed} échec(s) sur ${total} tests`,
+        failed === 0,
+      );
+    } catch (error) {
+      finish(`Impossible de charger les tests : ${error?.message ?? error}`, false);
+      console.error(error);
+    }
+  </script>
+</body>
+</html>
