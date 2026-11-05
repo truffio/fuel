@@ -125,7 +125,7 @@ function backupRaw(backend, raw, now) {
 function backupMessage(backupKey) {
   return backupKey
     ? `Une copie des données d’origine a été conservée dans le stockage du navigateur (clé « ${backupKey} »).`
-    : 'La copie de sauvegarde des données d’origine a échoué : l’enregistrement est désactivé pour ne pas les écraser.';
+    : 'La copie de sauvegarde des données d’origine a échoué\u00a0: l’enregistrement est désactivé pour ne pas les écraser.';
 }
 
 /**
@@ -150,7 +150,7 @@ export function load({ backend = defaultBackend(), now = new Date() } = {}) {
     return result(LOAD_STATUS.unavailable, {
       canSave: false,
       message:
-        'Le stockage local du navigateur est indisponible : les pleins saisis ne seront pas conservés après la fermeture de la page.',
+        'Le stockage local du navigateur est indisponible\u00a0: les pleins saisis ne seront pas conservés après la fermeture de la page.',
     });
   }
 
@@ -160,7 +160,7 @@ export function load({ backend = defaultBackend(), now = new Date() } = {}) {
   } catch {
     return result(LOAD_STATUS.unavailable, {
       canSave: false,
-      message: 'Impossible de lire le stockage local du navigateur : les données ne seront pas enregistrées.',
+      message: 'Impossible de lire le stockage local du navigateur\u00a0: les données ne seront pas enregistrées.',
     });
   }
 
@@ -246,7 +246,7 @@ function isQuotaError(error) {
  */
 export function save(state, { backend = defaultBackend() } = {}) {
   if (!backend) {
-    return { ok: false, message: 'Le stockage local du navigateur est indisponible : la modification n’a pas été enregistrée.' };
+    return { ok: false, message: 'Le stockage local du navigateur est indisponible\u00a0: la modification n’a pas été enregistrée.' };
   }
   try {
     backend.setItem(STORAGE_KEY, serialize(state));
@@ -255,8 +255,8 @@ export function save(state, { backend = defaultBackend() } = {}) {
     return {
       ok: false,
       message: isQuotaError(error)
-        ? 'L’espace de stockage du navigateur est plein : la modification n’a pas été enregistrée.'
-        : 'Impossible d’enregistrer dans le stockage local du navigateur : la modification n’a pas été enregistrée.',
+        ? 'L’espace de stockage du navigateur est plein\u00a0: la modification n’a pas été enregistrée.'
+        : 'Impossible d’enregistrer dans le stockage local du navigateur\u00a0: la modification n’a pas été enregistrée.',
     };
   }
 }

@@ -122,6 +122,103 @@ select {
   font-weight: 600;
 }
 
+[hidden] {
+  display: none !important;
+}
+
+/* Messages (storage problems, save failures) — the prefix text carries the meaning, not only colour */
+.messages:empty {
+  display: none;
+}
+
+.messages {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.message {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  overflow-wrap: anywhere;
+}
+
+.message-error {
+  border-left-color: var(--color-danger);
+}
+
+.message-warning {
+  border-left-color: var(--color-focus);
+}
+
+.message-info {
+  border-left-color: var(--color-primary);
+}
+
+/* Dashboard */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.stat {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  min-width: 0;
+}
+
+.stat dd {
+  margin: 0;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.stat-detail {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.hint {
+  margin-top: var(--space-3);
+}
+
+.note {
+  margin-top: var(--space-3);
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.empty-state {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+}
+
+.empty-state .note {
+  margin-top: 0;
+}
+
 dialog {
   width: min(100% - 2 * var(--space-3), 480px);
   border: 1px solid var(--color-border);
