@@ -211,7 +211,25 @@ function render() {
   renderChartOnly();
 }
 
+/**
+ * Another tab saved new data: adopt it instead of overwriting it on our next save
+ * (local data must never be erased silently, spec §10).
+ */
+function handleExternalChange(event) {
+  if (event.key !== storage.STORAGE_KEY && event.key !== null) return;
+  const reloaded = storage.load();
+  app.state = reloaded.state;
+  app.canSave = reloaded.canSave;
+  app.loadMessages = reloaded.message
+    ? [{ type: reloaded.status === 'recovered' ? 'warning' : 'error', text: reloaded.message }]
+    : [];
+  fillForm.close();
+  app.actionMessages = [{ type: 'info', text: 'Les données ont été mises à jour depuis un autre onglet.' }];
+  render();
+}
+
 elements.addFillButton.addEventListener('click', openAddForm);
+window.addEventListener('storage', handleExternalChange);
 for (const input of elements.metricInputs) {
   input.addEventListener('change', () => {
     if (input.checked) handleMetricChange(input.value);
