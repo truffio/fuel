@@ -9,7 +9,7 @@ A browser prototype for logging fuel fill-ups and tracking a vehicle's fuel cons
 
 ## Features
 
-- **Dashboard**: total spent, number of fills, total distance, and the weighted average efficiency (km/L and L/100 km)
+- **Dashboard**: total spent, number of fills, total distance, and the weighted average consumption (L/100 km, with km/L as detail)
 - **Add / edit a fill**: date, odometer, litres, price per litre and full-tank confirmation. Distance is never typed: it is computed from the odometer. A decimal comma is accepted, and errors are explained next to each field.
 - **Chart** (native SVG): price per litre, efficiency of the last interval, or cumulative spending. Each point has a tooltip on hover, tap or keyboard focus.
 - **History**: every value per fill, with edit and delete (after confirmation)
@@ -59,7 +59,7 @@ Start from an empty state. To get one, open the page in a private window, or del
 | 1 | Open the app | Short explanation and « Ajouter le premier plein »; no chart or history |
 | 2 | Add 2026‑10‑01, 10 000 km, 40 L, 1,60 $/L, full tank | Cost 64,00 $, cumulative 64,00 $; distance and efficiency « — »; message that a 2nd fill is needed |
 | 3 | Add 2026‑10‑15, 10 500 km, 40 L, 1,70 $/L | 500 km, 12,50 km/L, 68,00 $, cumulative 132,00 $ |
-| 4 | Add 2026‑11‑01, 10 920 km, 35 L, 1,65 $/L | 420 km, 12,00 km/L, 57,75 $, cumulative 189,75 $; average 12,27 km/L (920 km ÷ 75 L) |
+| 4 | Add 2026‑11‑01, 10 920 km, 35 L, 1,65 $/L | 420 km, 12,00 km/L, 57,75 $, cumulative 189,75 $; dashboard « Consommation moyenne » 8,2 L/100 km (75 L ÷ 920 km), 12,27 km/L underneath |
 | 5 | Switch the chart between the three metrics | Prix du litre: 3 points (1,60 / 1,70 / 1,65); Rendement: 2 points; Dépenses cumulées: 3 points up to 189,75 $ |
 | 6 | Select « Rendement » | No point for the first fill |
 | 7 | Try 0 L, « abc », an odometer ≤ the previous fill, a future date, or an unticked « Plein complet » | Refused, with a message next to the field |
