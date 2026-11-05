@@ -40,4 +40,5 @@ Following §13: when in doubt, favour data integrity and avoid misleading metric
 4. **Ordering and consistency.** Fills are ordered by date, then odometer, then `createdAt`. A fill is valid only if, in that order, the odometer is strictly increasing. Back-dated insertions are allowed if they respect this rule.
 5. **Total distance** (dashboard) = last odometer − first odometer, independent of broken intervals. **Overall efficiency** = Σdistance / Σlitres over valid intervals only.
 6. **Corrupt storage.** Never overwritten silently: the raw value is backed up under a separate key and the user is warned.
-7. **Tests** run with `node --test` (built into Node ≥ 18, no npm dependency); an optional browser test page covers users without Node.
+7. **Dates and numbers.** “Date réelle” (§4) is read as a real calendar date that is not in the future (local time). Numbers accept `,` or `.` as decimal separator and spaces as thousands separators; mixing `,` and `.` is rejected as ambiguous. No upper bounds beyond the spec.
+8. **Tests** run with `node --test` (built into Node ≥ 18, no npm dependency); an optional browser test page covers users without Node.
