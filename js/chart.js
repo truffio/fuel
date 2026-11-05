@@ -307,7 +307,7 @@ export function renderChart(container, points, metric) {
   const hint = html(
     'p',
     'note chart-hint',
-    'Survolez ou touchez un point pour voir le détail; au clavier, utilisez Tab puis les flèches.',
+    'Survolez ou touchez un point pour voir le détail. Au clavier : Tab, puis les flèches.',
   );
   container.replaceChildren(frame, hint);
 }
