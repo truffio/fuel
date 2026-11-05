@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suivi d’essence</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>Suivi d’essence</h1>
+    <button type="button" id="add-fill-button" class="button button-primary">Ajouter un plein</button>
+  </header>
+
+  <main class="app-main">
+    <div id="app-messages" class="messages" role="status" aria-live="polite"></div>
+
+    <section id="dashboard" class="panel" aria-labelledby="dashboard-title">
+      <h2 id="dashboard-title">Tableau de bord</h2>
+      <div id="dashboard-content"></div>
+    </section>
+
+    <section id="chart-section" class="panel" aria-labelledby="chart-title">
+      <h2 id="chart-title">Graphique</h2>
+      <div id="chart-content"></div>
+    </section>
+
+    <section id="history" class="panel" aria-labelledby="history-title">
+      <h2 id="history-title">Historique des pleins</h2>
+      <div id="history-content"></div>
+    </section>
+  </main>
+
+  <dialog id="fill-dialog" aria-labelledby="fill-dialog-title">
+    <h2 id="fill-dialog-title">Ajouter un plein</h2>
+    <div id="fill-form-content"></div>
+  </dialog>
+
+  <noscript>
+    <p class="panel">Cette application nécessite JavaScript.</p>
+  </noscript>
+</body>
+</html>
