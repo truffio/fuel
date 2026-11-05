@@ -37,4 +37,12 @@ Tests use Node's built-in runner and assertions (Node 18+, no npm install). From
 node --test
 ```
 
-Node finds `tests/*.test.js` automatically. More test coverage and a browser test page come in #5.
+Node finds `tests/*.test.js` automatically.
+
+Without Node, run the same tests in a browser: start the local server (see above) and open <http://localhost:8000/tests/>. The page uses an import map that points `node:test` and `node:assert/strict` to small shims in `tests/browser/`. When you add a test file, add it to the `files` list in `tests/index.html`.
+
+| File | Covers |
+|---|---|
+| `tests/calculations.test.js` | First fill, reference example (§5), weighted efficiency, ordering, non-full tanks, chart series, edit propagation, deletions |
+| `tests/validation.test.js` | Decimal comma/spaces, dates, bounds, full-tank confirmation, odometer consistency on insert and edit |
+| `tests/storage.test.js` | Round trip, missing key, corrupt JSON and backup, skipped entries, newer schema, unavailable storage, quota errors |
