@@ -2,7 +2,10 @@
 // Every change goes through commit(): save the raw data, then recompute everything from it and re-render.
 
 import * as storage from './storage.js';
+import { renderChart } from './chart.js';
 import {
+  METRICS,
+  chartSeries,
   computeSummary,
   enrichFills,
   isIntermediateFill,
@@ -18,6 +21,8 @@ const elements = {
   messages: document.getElementById('app-messages'),
   dashboard: document.getElementById('dashboard-content'),
   chartSection: document.getElementById('chart-section'),
+  chart: document.getElementById('chart-content'),
+  metricInputs: [...document.querySelectorAll('input[name="chart-metric"]')],
   historySection: document.getElementById('history'),
   history: document.getElementById('history-content'),
   historyTitle: document.getElementById('history-title'),
@@ -167,6 +172,26 @@ async function deleteFill(id) {
   (remaining.length > 0 ? elements.historyTitle : elements.addFillButton).focus();
 }
 
+/** The selected chart metric is part of the saved state (spec §8, `ui.chartMetric`). */
+function handleMetricChange(metric) {
+  if (!Object.values(METRICS).includes(metric) || metric === app.state.ui.chartMetric) return;
+  const nextState = { ...app.state, ui: { ...app.state.ui, chartMetric: metric } };
+  const result = commit(nextState);
+  if (!result.ok) {
+    // A display preference: apply it anyway, but say it was not saved.
+    app.state = nextState;
+    render();
+    setActionMessage({ type: 'warning', text: result.message });
+  }
+}
+
+let chartPoints = [];
+
+function renderChartOnly() {
+  if (elements.chartSection.hidden) return;
+  renderChart(elements.chart, chartPoints, app.state.ui.chartMetric);
+}
+
 function render() {
   const enriched = enrichFills(app.state.fills);
   const summary = computeSummary(enriched);
@@ -179,7 +204,27 @@ function render() {
   // Chart and history have nothing to show before the first fill (spec §6.5).
   elements.chartSection.hidden = !hasFills;
   elements.historySection.hidden = !hasFills;
+
+  const metric = app.state.ui.chartMetric;
+  for (const input of elements.metricInputs) input.checked = input.value === metric;
+  chartPoints = chartSeries(enriched, metric);
+  renderChartOnly();
 }
 
 elements.addFillButton.addEventListener('click', openAddForm);
+for (const input of elements.metricInputs) {
+  input.addEventListener('change', () => {
+    if (input.checked) handleMetricChange(input.value);
+  });
+}
+
+// The chart is drawn at its container's pixel width: redraw when that width changes.
+let lastChartWidth = 0;
+new ResizeObserver(([entry]) => {
+  const width = Math.round(entry.contentRect.width);
+  if (width === lastChartWidth) return;
+  lastChartWidth = width;
+  renderChartOnly();
+}).observe(elements.chart);
+
 render();

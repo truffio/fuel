@@ -501,3 +501,146 @@ dialog {
 #history-title:focus {
   outline: none;
 }
+
+/* Chart */
+.metric-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.metric-picker legend {
+  width: 100%;
+  margin-bottom: var(--space-1);
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.metric-picker label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-size);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.metric-picker label:has(input:checked) {
+  border-color: var(--color-primary);
+  border-width: 2px;
+  font-weight: 600;
+}
+
+.metric-picker input {
+  margin: 0;
+  accent-color: var(--color-primary);
+}
+
+.chart {
+  min-width: 0;
+}
+
+.chart-frame {
+  position: relative;
+  min-width: 0;
+}
+
+.chart-svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-axis text {
+  fill: var(--color-muted);
+}
+
+.chart-unit {
+  font-weight: 600;
+}
+
+.chart-grid {
+  stroke: var(--color-border);
+  stroke-dasharray: 2 3;
+}
+
+.chart-baseline,
+.chart-tick {
+  stroke: var(--color-muted);
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.chart-hit {
+  fill: transparent;
+}
+
+.chart-dot {
+  fill: var(--color-surface);
+  stroke: var(--color-primary);
+  stroke-width: 2.5;
+}
+
+.chart-point {
+  cursor: pointer;
+  outline: none;
+}
+
+.chart-point.is-active .chart-dot,
+.chart-point:focus-visible .chart-dot {
+  fill: var(--color-primary);
+}
+
+.chart-point:focus-visible .chart-hit {
+  stroke: var(--color-focus);
+  stroke-width: 3;
+}
+
+.chart-tooltip {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  gap: 2px;
+  max-width: 240px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) / 2);
+  background: var(--color-surface);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.18);
+  font-size: 0.875rem;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-empty {
+  padding: var(--space-4) var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.chart-empty .note {
+  margin-top: var(--space-1);
+}
+
+.chart-empty-title {
+  font-weight: 600;
+}
+
+.chart-hint {
+  margin-top: var(--space-2);
+}
