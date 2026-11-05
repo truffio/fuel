@@ -131,3 +131,127 @@ export function renderDashboard(container, summary, { onAddFill }) {
     el('p', { className: 'note' }, MEASUREMENT_ASSUMPTION),
   );
 }
+
+// ---------------------------------------------------------------------------
+// Add / edit form (spec §6.2)
+
+const FORM_FIELDS = ['date', 'odometerKm', 'liters', 'pricePerLiterCad', 'fullTank'];
+
+/** Shows a stored number in French notation for editing (1.65 → "1,65"). */
+function toInputNumber(value) {
+  return typeof value === 'number' && Number.isFinite(value) ? String(value).replace('.', ',') : '';
+}
+
+/**
+ * Controls the fill form inside its <dialog>.
+ *
+ * @param dialog the #fill-dialog element (markup in index.html)
+ * @param onSubmit (rawValues, editingId) => { ok } | { ok: false, errors?, message? }
+ * @param onPreview (rawValues, editingId) => { cost, distanceKm, isFirst } with nulls when unknown
+ * @param today () => YYYY-MM-DD, used as default date and upper bound
+ */
+export function createFillForm({ dialog, onSubmit, onPreview, today }) {
+  const form = dialog.querySelector('form');
+  const title = dialog.querySelector('#fill-dialog-title');
+  const submitButton = dialog.querySelector('#fill-submit');
+  const cancelButton = dialog.querySelector('#fill-cancel');
+  const preview = dialog.querySelector('#fill-preview');
+  const formError = dialog.querySelector('#fill-form-error');
+  const inputs = Object.fromEntries(FORM_FIELDS.map((name) => [name, form.elements[name]]));
+  const errorSlots = Object.fromEntries(
+    FORM_FIELDS.map((name) => [name, form.querySelector(`[data-error-for="${name}"]`)]),
+  );
+
+  let editingId = null;
+
+  function readValues() {
+    return {
+      date: inputs.date.value,
+      odometerKm: inputs.odometerKm.value,
+      liters: inputs.liters.value,
+      pricePerLiterCad: inputs.pricePerLiterCad.value,
+      fullTank: inputs.fullTank.checked,
+    };
+  }
+
+  function setFieldError(name, message) {
+    errorSlots[name].textContent = message ?? '';
+    inputs[name].setAttribute('aria-invalid', message ? 'true' : 'false');
+  }
+
+  function showErrors(errors) {
+    for (const name of FORM_FIELDS) setFieldError(name, errors[name]);
+    const firstInvalid = FORM_FIELDS.find((name) => errors[name]);
+    if (firstInvalid) inputs[firstInvalid].focus();
+  }
+
+  function showFormError(message) {
+    formError.textContent = message ?? '';
+    formError.hidden = !message;
+  }
+
+  function updatePreview() {
+    const { cost, distanceKm, isFirst } = onPreview(readValues(), editingId);
+    const parts = [];
+    if (cost !== null) parts.push(`Coût du plein : ${formatCurrency(cost)}`);
+    if (isFirst) {
+      parts.push('Premier plein : point de départ de l’odomètre');
+    } else if (distanceKm !== null) {
+      parts.push(`Distance depuis le plein précédent : ${formatKm(distanceKm)}`);
+    }
+    preview.textContent = parts.join(' · ');
+  }
+
+  function open({ mode, values }) {
+    editingId = mode === 'edit' ? values.id : null;
+    const editing = mode === 'edit';
+    title.textContent = editing ? 'Modifier un plein' : 'Ajouter un plein';
+    submitButton.textContent = editing ? 'Enregistrer les modifications' : 'Enregistrer';
+
+    inputs.date.max = today();
+    inputs.date.value = values.date ?? today();
+    inputs.odometerKm.value = toInputNumber(values.odometerKm);
+    inputs.liters.value = toInputNumber(values.liters);
+    inputs.pricePerLiterCad.value = toInputNumber(values.pricePerLiterCad);
+    inputs.fullTank.checked = values.fullTank === true;
+
+    showErrors({});
+    showFormError(null);
+    updatePreview();
+    if (!dialog.open) dialog.showModal();
+    (editing ? inputs.odometerKm : inputs.date).focus();
+  }
+
+  function close() {
+    if (dialog.open) dialog.close();
+  }
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    showFormError(null);
+    const result = onSubmit(readValues(), editingId);
+    if (result.ok) {
+      close();
+      return;
+    }
+    showErrors(result.errors ?? {});
+    if (result.message) showFormError(result.message);
+  });
+
+  form.addEventListener('input', (event) => {
+    const name = event.target.name;
+    if (name && errorSlots[name]?.textContent) setFieldError(name, null);
+    updatePreview();
+  });
+
+  cancelButton.addEventListener('click', close);
+  dialog.addEventListener('close', () => {
+    editingId = null;
+  });
+
+  return {
+    openAdd: () => open({ mode: 'add', values: { fullTank: false } }),
+    openEdit: (fill) => open({ mode: 'edit', values: fill }),
+    close,
+  };
+}

@@ -33,8 +33,54 @@
   </main>
 
   <dialog id="fill-dialog" aria-labelledby="fill-dialog-title">
-    <h2 id="fill-dialog-title">Ajouter un plein</h2>
-    <div id="fill-form-content"></div>
+    <form id="fill-form" class="fill-form" novalidate>
+      <h2 id="fill-dialog-title">Ajouter un plein</h2>
+
+      <div class="field">
+        <label for="fill-date">Date du plein</label>
+        <input id="fill-date" name="date" type="date" required aria-describedby="fill-date-error">
+        <p id="fill-date-error" class="field-error" data-error-for="date"></p>
+      </div>
+
+      <div class="field">
+        <label for="fill-odometer">Odomètre <span class="unit">(km au compteur)</span></label>
+        <input id="fill-odometer" name="odometerKm" type="text" inputmode="decimal" autocomplete="off" required
+               placeholder="ex. 10 500" aria-describedby="fill-odometer-help fill-odometer-error">
+        <p id="fill-odometer-help" class="field-help">Kilométrage total du véhicule, pas la distance depuis le dernier plein.</p>
+        <p id="fill-odometer-error" class="field-error" data-error-for="odometerKm"></p>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="fill-liters">Essence ajoutée <span class="unit">(L)</span></label>
+          <input id="fill-liters" name="liters" type="text" inputmode="decimal" autocomplete="off" required
+                 placeholder="ex. 40,5" aria-describedby="fill-liters-error">
+          <p id="fill-liters-error" class="field-error" data-error-for="liters"></p>
+        </div>
+
+        <div class="field">
+          <label for="fill-price">Prix du litre <span class="unit">($/L)</span></label>
+          <input id="fill-price" name="pricePerLiterCad" type="text" inputmode="decimal" autocomplete="off" required
+                 placeholder="ex. 1,65" aria-describedby="fill-price-error">
+          <p id="fill-price-error" class="field-error" data-error-for="pricePerLiterCad"></p>
+        </div>
+      </div>
+
+      <div class="field field-checkbox">
+        <input id="fill-full-tank" name="fullTank" type="checkbox" aria-describedby="fill-full-tank-help fill-full-tank-error">
+        <label for="fill-full-tank">Plein complet (réservoir rempli jusqu’au déclenchement de la pompe)</label>
+        <p id="fill-full-tank-help" class="field-help">La consommation n’est calculée qu’entre deux pleins complets.</p>
+        <p id="fill-full-tank-error" class="field-error" data-error-for="fullTank"></p>
+      </div>
+
+      <p id="fill-preview" class="fill-preview" aria-live="polite"></p>
+      <p id="fill-form-error" class="message message-error" role="alert" hidden></p>
+
+      <div class="form-actions">
+        <button type="button" id="fill-cancel" class="button">Annuler</button>
+        <button type="submit" id="fill-submit" class="button button-primary">Enregistrer</button>
+      </div>
+    </form>
   </dialog>
 
   <noscript>

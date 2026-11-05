@@ -11,6 +11,7 @@ import {
   isIntermediateFill,
   removeFill,
   sortFills,
+  upsertFill,
 } from '../js/calculations.js';
 
 const EPSILON = 1e-9;
@@ -206,4 +207,33 @@ test('removing an unknown id leaves the list unchanged', () => {
   const { fills, brokenFillId } = removeFill(referenceFills(), 'zzz');
   assert.equal(fills.length, 3);
   assert.equal(brokenFillId, null);
+});
+
+test('upsertFill adds or replaces by id without mutating', () => {
+  const fills = referenceFills();
+  const added = upsertFill(fills, fill('d', '2026-11-20', 11300, 30, 1.55));
+  assert.equal(added.length, 4);
+  assert.equal(fills.length, 3);
+
+  const replaced = upsertFill(fills, { ...fills[1], liters: 41 });
+  assert.equal(replaced.length, 3);
+  assert.equal(replaced.find((f) => f.id === 'b').liters, 41);
+  assert.equal(fills[1].liters, 40);
+});
+
+test('re-inserting a fill before a broken interval restores it; edits keep the flag', () => {
+  const { fills: afterDelete } = removeFill(referenceFills(), 'b');
+  assert.equal(afterDelete.find((f) => f.id === 'c').intervalBroken, true);
+
+  const edited = upsertFill(afterDelete, { ...afterDelete.find((f) => f.id === 'c'), liters: 36 });
+  assert.equal(edited.find((f) => f.id === 'c').intervalBroken, true, 'edit keeps the flag');
+
+  const restored = upsertFill(afterDelete, fill('b2', '2026-10-15', 10500, 40, 1.7));
+  const c = restored.find((f) => f.id === 'c');
+  assert.equal('intervalBroken' in c, false);
+  const enriched = enrichFills(restored);
+  assertClose(enriched[2].kmPerL, 12);
+
+  const unrelated = upsertFill(afterDelete, fill('z', '2026-11-20', 11300, 30, 1.55));
+  assert.equal(unrelated.find((f) => f.id === 'c').intervalBroken, true, 'insert elsewhere keeps the flag');
 });

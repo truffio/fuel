@@ -180,3 +180,28 @@ export function isIntermediateFill(fills, id) {
   const position = sorted.findIndex((fill) => fill.id === id);
   return position > 0 && position < sorted.length - 1;
 }
+
+/**
+ * Adds a new fill or replaces an existing one (same id) and returns the new raw list.
+ * When a new fill is inserted right before a fill flagged `intervalBroken`, that flag is
+ * cleared: the interval again runs between two recorded fills, so its litres are
+ * consistent with its distance (spec §7, “jusqu’à rétablissement de données cohérentes”).
+ * Edits never clear the flag.
+ */
+export function upsertFill(fills, fill) {
+  const exists = fills.some((existing) => existing.id === fill.id);
+  if (exists) {
+    return fills.map((existing) => (existing.id === fill.id ? fill : existing));
+  }
+
+  const next = [...fills, fill];
+  const sorted = sortFills(next);
+  const following = sorted[sorted.findIndex((existing) => existing.id === fill.id) + 1];
+  if (!following?.intervalBroken) return next;
+
+  return next.map((existing) => {
+    if (existing.id !== following.id) return existing;
+    const { intervalBroken, ...rest } = existing;
+    return rest;
+  });
+}

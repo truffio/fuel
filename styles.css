@@ -231,3 +231,106 @@ dialog {
 dialog::backdrop {
   background: rgb(0 0 0 / 0.45);
 }
+
+dialog {
+  max-height: calc(100dvh - 2 * var(--space-3));
+  overflow-y: auto;
+}
+
+/* Fill form */
+.fill-form {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.field-row {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 420px) {
+  .field-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.unit {
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.field input[type="text"],
+.field input[type="date"] {
+  width: 100%;
+  min-height: var(--tap-size);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius) / 2);
+  background: var(--color-bg);
+}
+
+.field input[aria-invalid="true"] {
+  border-color: var(--color-danger);
+  border-width: 2px;
+}
+
+.field-checkbox {
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  column-gap: var(--space-2);
+}
+
+.field-checkbox input {
+  width: 24px;
+  height: 24px;
+  margin: 2px 0 0;
+}
+
+.field-checkbox .field-help,
+.field-checkbox .field-error {
+  grid-column: 2;
+}
+
+.field-help {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.field-error {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-danger);
+}
+
+.field-error:empty {
+  display: none;
+}
+
+.field-error::before {
+  content: "⚠ ";
+}
+
+.fill-preview {
+  font-variant-numeric: tabular-nums;
+}
+
+.fill-preview:empty {
+  display: none;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
