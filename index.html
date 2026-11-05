@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suivi d’essence</title>
+  <meta name="description" content="Consignez vos pleins d’essence et suivez la consommation et les dépenses de votre véhicule. Données conservées dans votre navigateur.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#121418" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f5fbf'/%3E%3Cpath d='M10 25V8.5A1.5 1.5 0 0 1 11.5 7h7A1.5 1.5 0 0 1 20 8.5V25zM12.5 9.5v5h5v-5zM20 13h1.5a1.5 1.5 0 0 1 1.5 1.5V21a1 1 0 0 0 2 0v-8.5l-2.5-3' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>Suivi d’essence</h1>
+    <button type="button" id="add-fill-button" class="button button-primary">Ajouter un plein</button>
+  </header>
+
+  <main class="app-main">
+    <div id="app-messages" class="messages" role="status" aria-live="polite"></div>
+
+    <section id="dashboard" class="panel" aria-labelledby="dashboard-title">
+      <h2 id="dashboard-title">Tableau de bord</h2>
+      <div id="dashboard-content"></div>
+    </section>
+
+    <section id="chart-section" class="panel" aria-labelledby="chart-title">
+      <h2 id="chart-title">Graphique</h2>
+      <fieldset class="metric-picker">
+        <legend>Métrique affichée</legend>
+        <label><input type="radio" name="chart-metric" value="pricePerLiter"> Prix du litre</label>
+        <label><input type="radio" name="chart-metric" value="kmPerL"> Rendement</label>
+        <label><input type="radio" name="chart-metric" value="cumulativeCost"> Dépenses cumulées</label>
+      </fieldset>
+      <div id="chart-content" class="chart"></div>
+    </section>
+
+    <section id="history" class="panel" aria-labelledby="history-title">
+      <h2 id="history-title" tabindex="-1">Historique des pleins</h2>
+      <div id="history-content"></div>
+    </section>
+  </main>
+
+  <dialog id="fill-dialog" aria-labelledby="fill-dialog-title">
+    <form id="fill-form" class="fill-form" novalidate>
+      <h2 id="fill-dialog-title">Ajouter un plein</h2>
+
+      <div class="field">
+        <label for="fill-date">Date du plein</label>
+        <input id="fill-date" name="date" type="date" required aria-describedby="fill-date-error">
+        <p id="fill-date-error" class="field-error" data-error-for="date"></p>
+      </div>
+
+      <div class="field">
+        <label for="fill-odometer">Odomètre <span class="unit">(km au compteur)</span></label>
+        <input id="fill-odometer" name="odometerKm" type="text" inputmode="decimal" autocomplete="off" required
+               placeholder="ex. 10 500" aria-describedby="fill-odometer-help fill-odometer-error">
+        <p id="fill-odometer-help" class="field-help">Kilométrage total du véhicule, pas la distance depuis le dernier plein.</p>
+        <p id="fill-odometer-error" class="field-error" data-error-for="odometerKm"></p>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="fill-liters">Essence ajoutée <span class="unit">(L)</span></label>
+          <input id="fill-liters" name="liters" type="text" inputmode="decimal" autocomplete="off" required
+                 placeholder="ex. 40,5" aria-describedby="fill-liters-error">
+          <p id="fill-liters-error" class="field-error" data-error-for="liters"></p>
+        </div>
+
+        <div class="field">
+          <label for="fill-price">Prix du litre <span class="unit">($/L)</span></label>
+          <input id="fill-price" name="pricePerLiterCad" type="text" inputmode="decimal" autocomplete="off" required
+                 placeholder="ex. 1,65" aria-describedby="fill-price-error">
+          <p id="fill-price-error" class="field-error" data-error-for="pricePerLiterCad"></p>
+        </div>
+      </div>
+
+      <div class="field field-checkbox">
+        <input id="fill-full-tank" name="fullTank" type="checkbox" aria-describedby="fill-full-tank-help fill-full-tank-error">
+        <label for="fill-full-tank">Plein complet (réservoir rempli jusqu’au déclenchement de la pompe)</label>
+        <p id="fill-full-tank-help" class="field-help">La consommation n’est calculée qu’entre deux pleins complets.</p>
+        <p id="fill-full-tank-error" class="field-error" data-error-for="fullTank"></p>
+      </div>
+
+      <p id="fill-preview" class="fill-preview" aria-live="polite"></p>
+      <p id="fill-form-error" class="message message-error" role="alert" hidden></p>
+
+      <div class="form-actions">
+        <button type="button" id="fill-cancel" class="button">Annuler</button>
+        <button type="submit" id="fill-submit" class="button button-primary">Enregistrer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-text confirm-warning">
+    <form method="dialog" class="confirm-form">
+      <h2 id="confirm-title">Supprimer ce plein&#8239;?</h2>
+      <p id="confirm-text"></p>
+      <p id="confirm-warning" class="message message-warning" hidden></p>
+      <div class="form-actions">
+        <button type="submit" value="cancel" class="button" autofocus>Annuler</button>
+        <button type="submit" value="confirm" id="confirm-accept" class="button button-danger">Supprimer</button>
+      </div>
+    </form>
+  </dialog>
+
+  <noscript>
+    <p class="panel">Cette application nécessite JavaScript.</p>
+  </noscript>
+</body>
+</html>
