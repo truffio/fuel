@@ -71,6 +71,17 @@ select {
   outline-offset: 2px;
 }
 
+.greeting {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-3) 0;
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
 .app-header {
   display: flex;
   flex-wrap: wrap;
