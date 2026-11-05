@@ -1,0 +1,136 @@
+/* Suivi d’essence — base styles (mobile-first) */
+
+:root {
+  --color-bg: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-text: #1c1f24;
+  --color-muted: #5b6270;
+  --color-border: #d6d9df;
+  --color-primary: #1f5fbf;
+  --color-primary-text: #ffffff;
+  --color-danger: #b42318;
+  --color-focus: #f0a500;
+
+  --radius: 10px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 1rem;
+  --space-4: 1.5rem;
+  --tap-size: 44px;
+  --max-width: 960px;
+
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #121418;
+    --color-surface: #1c1f25;
+    --color-text: #e8eaee;
+    --color-muted: #a3a9b5;
+    --color-border: #343944;
+    --color-primary: #6ea2ff;
+    --color-primary-text: #0b1220;
+    --color-danger: #ff8a7d;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-3);
+}
+
+.app-header h1 {
+  font-size: 1.375rem;
+}
+
+.app-main {
+  display: grid;
+  gap: var(--space-3);
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-3) var(--space-4);
+}
+
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  min-width: 0; /* allow children to shrink: no horizontal page scroll */
+}
+
+.panel h2 {
+  font-size: 1.125rem;
+  margin-bottom: var(--space-2);
+}
+
+.button {
+  min-height: var(--tap-size);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.button-primary {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-primary-text);
+  font-weight: 600;
+}
+
+dialog {
+  width: min(100% - 2 * var(--space-3), 480px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: var(--space-3);
+}
+
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
